@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Selection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+        <h2 class="text-lg font-bold mb-4">Food Menu Generator</h2>
+        <div id="item-container">
+            <!-- Dynamic items will be added here -->
+        </div>
+        <button onclick="addItem()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Add More Item</button>
+        <button onclick="previewItems()" class="mt-4 bg-green-500 text-white px-4 py-2 rounded ml-2">Preview</button>
+    </div>
+    
+    <!-- Preview Modal -->
+    <div id="preview-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded shadow w-96">
+            <h2 class="text-lg font-bold mb-4">Selected Items</h2>
+            <div id="preview-content"></div>
+            <div class="flex justify-end mt-4">
+                <button onclick="closePreview()" class="bg-gray-500 text-white px-4 py-2 rounded mr-2">Close</button>
+                <button onclick="window.print()" class="bg-blue-500 text-white px-4 py-2 rounded">Print</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+const itemDetails = [
+    { itemName: "Besan Pota", itemNameUnit: "KG" },
+    { itemName: "Haldi", itemNameUnit: "KG" },
+    { itemName: "Chaipatti", itemNameUnit: "KG" },
+    { itemName: "Lal Mirch", itemNameUnit: "KG" },
+    { itemName: "Dhaniya", itemNameUnit: "KG" },
+    { itemName: "Khopra", itemNameUnit: "KG" },
+    { itemName: "Moongfali", itemNameUnit: "KG" },
+    { itemName: "Jeera", itemNameUnit: "KG" },
+    { itemName: "Ajwain", itemNameUnit: "KG" },
+    { itemName: "Methi", itemNameUnit: "KG" },
+    { itemName: "Til", itemNameUnit: "KG" },
+    { itemName: "Kaju", itemNameUnit: "KG" },
+    { itemName: "Badam", itemNameUnit: "KG" },
+    { itemName: "Kishmish", itemNameUnit: "KG" },
+    { itemName: "Chuhara", itemNameUnit: "KG" },
+    { itemName: "Papad", itemNameUnit: "KG" },
+    { itemName: "Muramura", itemNameUnit: "KG" },
+    { itemName: "Chana", itemNameUnit: "KG" },
+    { itemName: "Gehu", itemNameUnit: "KG" },
+    { itemName: "Chawal", itemNameUnit: "KG" },
+    { itemName: "Arhar Dal", itemNameUnit: "KG" },
+    { itemName: "Masoor Dal", itemNameUnit: "KG" },
+    { itemName: "Urad Dal", itemNameUnit: "KG" },
+    { itemName: "Moong Dal", itemNameUnit: "KG" },
+    { itemName: "Tuar Dal", itemNameUnit: "KG" },
+    { itemName: "Namak", itemNameUnit: "KG" },
+    { itemName: "Cheeni", itemNameUnit: "KG" },
+    { itemName: "Gur", itemNameUnit: "KG" },
+    { itemName: "Tel", itemNameUnit: "Litre" },
+    { itemName: "Sarson", itemNameUnit: "KG" },
+    { itemName: "Nariyal", itemNameUnit: "KG" },
+    { itemName: "Sabudana", itemNameUnit: "KG" },
+    { itemName: "Sooji", itemNameUnit: "KG" },
+    { itemName: "Maida", itemNameUnit: "KG" },
+    { itemName: "Atta", itemNameUnit: "KG" },
+    { itemName: "Shakkar", itemNameUnit: "KG" },
+    { itemName: "Paneer", itemNameUnit: "KG" },
+    { itemName: "Doodh", itemNameUnit: "Litre" },
+    { itemName: "Dahi", itemNameUnit: "KG" },
+    { itemName: "Mawa", itemNameUnit: "KG" },
+    { itemName: "Makkhan", itemNameUnit: "KG" },
+    { itemName: "Ghee", itemNameUnit: "Litre" },
+    { itemName: "Nimbu", itemNameUnit: "KG" },
+    { itemName: "Aam", itemNameUnit: "KG" },
+    { itemName: "Seb", itemNameUnit: "KG" },
+    { itemName: "Kela", itemNameUnit: "Dozen" },
+    { itemName: "Narangi", itemNameUnit: "KG" },
+    { itemName: "Angoor", itemNameUnit: "KG" },
+    { itemName: "Anar", itemNameUnit: "KG" },
+    { itemName: "Tarbooj", itemNameUnit: "KG" },
+    { itemName: "Kharbooja", itemNameUnit: "KG" },
+    { itemName: "Amrood", itemNameUnit: "KG" },
+    { itemName: "Papita", itemNameUnit: "KG" },
+    { itemName: "Santra", itemNameUnit: "KG" },
+    { itemName: "Lauki", itemNameUnit: "KG" },
+    { itemName: "Torai", itemNameUnit: "KG" },
+    { itemName: "Bhindi", itemNameUnit: "KG" },
+    { itemName: "Baingan", itemNameUnit: "KG" },
+    { itemName: "Phool Gobhi", itemNameUnit: "KG" },
+    { itemName: "Patta Gobhi", itemNameUnit: "KG" },
+    { itemName: "Palak", itemNameUnit: "KG" },
+    { itemName: "Methi", itemNameUnit: "KG" },
+    { itemName: "Gajar", itemNameUnit: "KG" },
+    { itemName: "Mooli", itemNameUnit: "KG" },
+    { itemName: "Aloo", itemNameUnit: "KG" },
+    { itemName: "Pyaaz", itemNameUnit: "KG" },
+    { itemName: "Tamatar", itemNameUnit: "KG" },
+    { itemName: "Adrak", itemNameUnit: "KG" },
+    { itemName: "Lahsun", itemNameUnit: "KG" },
+    { itemName: "Hari Mirch", itemNameUnit: "KG" },
+    { itemName: "Dhaniya Patta", itemNameUnit: "Bundle" },
+    { itemName: "Pudina", itemNameUnit: "Bundle" }
+];
+
+
+        function addItem() {
+            const container = document.getElementById("item-container");
+            const div = document.createElement("div");
+            div.classList.add("flex", "items-center", "gap-2", "mb-2");
+            
+            const select = document.createElement("select");
+            select.classList.add("border", "p-2", "rounded");
+            select.innerHTML = itemDetails.map(item => `<option value="${item.itemName}" data-unit="${item.itemNameUnit}">${item.itemName}</option>`).join('');
+            
+            const input = document.createElement("input");
+            input.type = "number";
+            input.placeholder = "Quantity";
+            input.classList.add("border", "p-2", "rounded", "w-20");
+            
+            const unit = document.createElement("span");
+            unit.innerText = itemDetails[0].itemNameUnit;
+            select.onchange = function() {
+                unit.innerText = select.options[select.selectedIndex].dataset.unit;
+            };
+            
+            div.appendChild(select);
+            div.appendChild(input);
+            div.appendChild(unit);
+            container.appendChild(div);
+        }
+        
+        function previewItems() {
+            const items = document.querySelectorAll("#item-container div");
+            const previewContent = document.getElementById("preview-content");
+            previewContent.innerHTML = "";
+            
+            items.forEach(div => {
+                const select = div.querySelector("select");
+                const input = div.querySelector("input");
+                const unit = div.querySelector("span");
+                
+                if (input.value) {
+                    const p = document.createElement("p");
+                    p.innerText = `${select.value} - ${input.value} ${unit.innerText}`;
+                    previewContent.appendChild(p);
+                }
+            });
+            
+            document.getElementById("preview-modal").classList.remove("hidden");
+        }
+        
+        function closePreview() {
+            document.getElementById("preview-modal").classList.add("hidden");
+        }
+        
+        addItem();
+    </script>
+</body>
+</html>
